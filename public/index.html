@@ -1,0 +1,186 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+	<meta charset="UTF-8" />
+	<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+	<title>FCY Transaction Calculator</title>
+	<style>
+		body {
+			font-family: 'Segoe UI', sans-serif;
+			background-color: #f0f2f5;
+			display: flex;
+			justify-content: center;
+			align-items: flex-start;
+			min-height: 100vh;
+			margin: 0;
+			padding: 2rem;
+		}
+
+		.container {
+			background: #fff;
+			padding: 2rem;
+			border-radius: 12px;
+			box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+			width: 100%;
+			max-width: 600px;
+		}
+
+		h2 {
+			text-align: center;
+			margin-bottom: 1.5rem;
+		}
+
+		input,
+		button {
+			width: 100%;
+			padding: 10px;
+			margin: 8px 0;
+			font-size: 1rem;
+			border: 1px solid #ccc;
+			border-radius: 8px;
+		}
+
+		button {
+			background: #007bff;
+			color: #fff;
+			border: none;
+			cursor: pointer;
+		}
+
+		button:hover {
+			background: #0056b3;
+		}
+
+		.result {
+			margin-top: 1rem;
+			font-size: 1rem;
+		}
+
+		.highlight {
+			font-weight: bold;
+			color: #28a745;
+		}
+
+		table {
+			width: 100%;
+			border-collapse: collapse;
+			margin-top: 1.5rem;
+		}
+
+		th,
+		td {
+			padding: 10px;
+			border: 1px solid #ddd;
+			text-align: center;
+		}
+
+		th {
+			background-color: #007bff;
+			color: white;
+		}
+
+		.clear-btn {
+			background: #dc3545;
+			margin-top: 10px;
+		}
+
+		.clear-btn:hover {
+			background: #a71d2a;
+		}
+	</style>
+</head>
+
+<body>
+	<div class="container">
+		<h2>FCY Calculator</h2>
+		<input id="markupRate" type="number" placeholder="FCY Markup Rate (%)" />
+		<input id="transactionAmount" type="number" placeholder="Transaction Amount (X)" />
+		<button onclick="calculate()">Calculate</button>
+
+		<div class="result" id="output"></div>
+
+		<div id="historySection">
+			<h3 style="margin-top: 2rem;">Transaction History</h3>
+			<table id="historyTable" style="display:none;">
+				<thead>
+					<tr>
+						<th>Amount (X)</th>
+						<th>Markup</th>
+						<th>IGST</th>
+						<th>DCC</th>
+						<th>Final Amount</th>
+					</tr>
+				</thead>
+				<tbody id="historyBody"></tbody>
+			</table>
+			<button class="clear-btn" onclick="clearHistory()" style="display:none;" id="clearBtn">Clear
+				History</button>
+		</div>
+	</div>
+
+	<script>
+		const IGST_RATE = 0.18;
+		const DCC_RATE = 0.01;
+		const history = [];
+
+		function calculate() {
+			const markupRate = parseFloat(document.getElementById("markupRate").value) / 100;
+			const X = parseFloat(document.getElementById("transactionAmount").value);
+
+			if (isNaN(markupRate) || markupRate <= 0) {
+				alert("Please enter a valid FCY Markup Rate.");
+				return;
+			}
+			if (isNaN(X) || X <= 0) {
+				alert("Please enter a valid Transaction Amount.");
+				return;
+			}
+
+			const FCYMarkup = X * markupRate;
+			const IGST = FCYMarkup * IGST_RATE;
+			const DCC = X * DCC_RATE;
+			const finalAmount = X + FCYMarkup + IGST;
+
+			document.getElementById("output").innerHTML = `
+        <p>For Transaction Amount: <span class="highlight">${X.toFixed(2)}</span></p>
+        <p>FCY Markup (${(markupRate * 100).toFixed(2)}%): <span class="highlight">${FCYMarkup.toFixed(2)}</span></p>
+        <p>IGST (18% of FCY Markup): <span class="highlight">${IGST.toFixed(2)}</span></p>
+        <p>DCC (1% of X): <span class="highlight">${DCC.toFixed(2)}</span></p>
+        <p>Final Amount: <span class="highlight">${finalAmount.toFixed(2)}</span></p>
+      `;
+
+			addToHistory({ X, FCYMarkup, IGST, DCC, finalAmount });
+		}
+
+		function addToHistory(entry) {
+			history.push(entry);
+			const table = document.getElementById("historyTable");
+			const body = document.getElementById("historyBody");
+			const clearBtn = document.getElementById("clearBtn");
+
+			const row = document.createElement("tr");
+			row.innerHTML = `
+        <td>${entry.X.toFixed(2)}</td>
+        <td>${entry.FCYMarkup.toFixed(2)}</td>
+        <td>${entry.IGST.toFixed(2)}</td>
+        <td>${entry.DCC.toFixed(2)}</td>
+        <td>${entry.finalAmount.toFixed(2)}</td>
+      `;
+			body.appendChild(row);
+
+			table.style.display = "table";
+			clearBtn.style.display = "inline-block";
+		}
+
+		function clearHistory() {
+			history.length = 0;
+			const body = document.getElementById("historyBody");
+			body.innerHTML = "";
+			document.getElementById("historyTable").style.display = "none";
+			document.getElementById("clearBtn").style.display = "none";
+		}
+	</script>
+</body>
+
+</html>
