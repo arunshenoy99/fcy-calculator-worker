@@ -2,6 +2,10 @@
 
 A Cloudflare Worker that serves a foreign currency (FCY) transaction calculator as a Single Page Application (SPA). This worker handles static asset delivery and supports client-side routing by falling back to `index.html` on unknown paths.
 
+![Screenshot of FCY Calculator](assets/screenshot-1.png)
+
+![Screenshot of FCY Calculator](assets/screenshot-2.png)
+
 ## Features
 
 - Serves static assets from the `public/` directory using Cloudflare’s asset binding system.
