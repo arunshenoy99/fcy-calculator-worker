@@ -20,8 +20,6 @@ export default {
       response = await env.ASSETS.fetch(fallbackRequest);
     }
 
-	console.log("PATH:", pathname);
-
     return response;
   }
 };
